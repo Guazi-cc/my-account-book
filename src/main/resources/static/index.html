@@ -1,13 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Index</title>
+    <meta charset="utf-8">
+    <title>Layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="layui/css/layui.css"  media="all">
+    <script src="layui/layui.js" charset="utf-8"></script>
 </head>
-<style>
-
-</style>
 <body>
-    <h1>This is H1</h1>
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+    <legend>选完文件后不自动上传</legend>
+</fieldset>
+
+<form method="post" id="sourceupload">
+    <div style="padding-left: 50px;margin-bottom: 25px;">
+        <button type="button" class="layui-btn layui-btn-primary" id="test4"><i class="layui-icon"></i>资源上传</button>
+        <input type="text" name="sourcename" required lay-verify="required" placeholder="请输入资源名称"class="layui-input" style="width: 420px;display: inline; margin-left: 25px;">
+        <input type="text" name="sourcepath" id="sourcepath" style="width: 420px;display: none; margin-left: 25px;">
+    </div>
+    <textarea name="description" placeholder="请输入资源介绍" required lay-verify="required" class="layui-textarea" style="font-size: 15px;margin-bottom: 20ox;width: 800px;"></textarea>
+    <button class="layui-btn" lay-submit lay-filter="uploadbtn" style="margin-left: 660px ;margin-top:25px;width: 120px;">立即提交</button>
+</form>
+<br>
+<br>
+<br>
+<br>
+<br>
+<table class="layui-hide" id="test" lay-filter="test"></table>
+<script>
+
+    layui.use('upload', function(){
+        var $ = layui.jquery;
+        var upload = layui.upload;
+
+        //执行实例
+        var uploadInst = upload.render({
+            elem: '#test4', //绑定元素
+            accept: 'file',
+            size: 307200,
+            url: '/source/myUploadSource', //上传接口
+            method: 'POST',
+            done: function(res){
+                //上传完毕回调
+                layer.alert("上传成功！"+res.msg, {
+                    icon: 5,
+                    title: "提示"
+                });
+                $("#sourcepath").val(res.msg);
+
+            }
+            ,error: function(res){
+                //请求异常回调
+                layer.alert("后台出错", {
+                    icon: 5,
+                    title: "提示"
+                });
+            }
+        });
+    });
+
+    layui.use('table', function(){
+        var table = layui.table;
+
+        table.render({
+            elem: '#test'
+            ,url:'/source/getData'
+            ,toolbar: true
+            ,title: '数据表'
+            ,totalRow: true
+            ,cols: [[
+                {field:'chDay', title:'chDay', width:80, fixed: 'left', unresize: true, sort: true}
+                ,{field:'incomeNm', title:'incomeNm', width:120, edit: 'text'}
+                ,{field:'income', title:'income', width:150, edit: 'text', totalRow: true}
+                ,{field:'outcomeNm', title:'outcomeNm', width:100, sort: true, totalRow: true}
+                ,{field:'outcome', title:'outcome', width:80, edit: 'text', sort: true, totalRow: true}
+                ,{field:'stanDay', title:'stanDay', width:100, sort: true, totalRow: true}
+            ]]
+            ,page: true
+            ,response: {
+                statusCode: 200 //重新规定成功的状态码为 200，table 组件默认为 0
+            }
+            ,parseData: function(res){ //将原始数据解析成 table 组件所规定的数据
+                return {
+                    "code": res.code, //解析接口状态
+                    "msg": res.msg, //解析提示文本
+                    "data": res.list //解析数据列表
+                };
+            }
+        });
+    });
+</script>
+
 </body>
 </html>
