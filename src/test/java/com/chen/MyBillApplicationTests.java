@@ -10,4 +10,11 @@ class MyBillApplicationTests {
     void contextLoads() {
     }
 
+    @Test
+    public void test01() {
+        String str = "dfdsdfdsfdsfdfddfdfabcd\nfdsfdfddfdfabcd    =1155";
+        str = str.substring(0, str.indexOf("=")).trim();
+        System.out.println(str);
+    }
+
 }
