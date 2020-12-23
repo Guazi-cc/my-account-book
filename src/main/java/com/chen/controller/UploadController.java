@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,45 +25,23 @@ public class UploadController {
     public Common<Bill> myUploadSource(@RequestParam("file") MultipartFile file , HttpServletRequest request) {
         String fileName = file.getOriginalFilename();
         String suffix = fileName.substring(fileName.lastIndexOf("."), fileName.length());
-        List<Bill> billList = new ArrayList<>();
-        try(InputStreamReader read = new InputStreamReader(file.getInputStream(), "UTF-8")) {
-            BufferedReader bufferedReader = new BufferedReader(read);
-            String lineTxt;
-            Integer lineCount = 0;      //记录行数
-            while((lineTxt = bufferedReader.readLine()) != null){
-                lineCount += 1;
-                if(lineCount != 1){     // 跳过第一行
-                    String[] aa = lineTxt.split("/");
-                    for (int i = 1; i < aa.length; i++) {
-                        Bill bill = new Bill();
-                        bill.setChDay(aa[0]);
-                        String str1 = aa[i].trim();
-                        if(strIsNotNull(str1)) {
-                            for (int j = str1.length()-1; j >= 0; j--) {
-                                if(!isNumber(str1.charAt(j))) {
-                                    if(str1.charAt(j)==43){     //若是 “+” 则为收入
-                                        bill.setIncomeNm(str1.substring(0, j));
-                                        bill.setIncome(Double.parseDouble(str1.substring(j+1, str1.length())));
-                                        break;
-                                    } else {                    //否则支出
-                                        bill.setOutcomeNm(str1.substring(0, j+1));
-                                        bill.setOutcome(Double.valueOf(str1.substring(j+1, str1.length())));
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        billList.add(bill);
-                    }
+        if(".txt".equals(suffix)) {
+            try {
+                List<Bill> billList = analysisAccountBookFile(file.getInputStream());
+                if (billList != null) {
+                    billCommon.setCode(200);
+                    billCommon.setMsg("Oj8K");
+                    billCommon.setList(billList);
+                } else {
+                    billCommon.setCode(500);
+                    billCommon.setMsg("读取文件出错");
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            billList.forEach(System.out::println);
-            billCommon.setCode(200);
-            billCommon.setMsg("Oj8K");
-            billCommon.setList(billList);
-        } catch (Exception e) {
-            System.out.println("读取文件内容出错");
-            e.printStackTrace();
+        } else {
+            billCommon.setMsg("请传txt");
+            billCommon.setCode(500);
         }
         return billCommon;
     }
@@ -125,4 +104,50 @@ public class UploadController {
     public static boolean strIsNotNull(String str) {
         return str != null && !"".equals(str);
     }
+
+    public List<Bill> analysisAccountBookFile(InputStream inputStream) {
+        List<Bill> billList = new ArrayList<>();
+        try(InputStreamReader read = new InputStreamReader(inputStream, StandardCharsets.UTF_8.name())) {
+            BufferedReader bufferedReader = new BufferedReader(read);
+            String lineTxt;
+            Integer lineCount = 0;      //记录行数
+            while((lineTxt = bufferedReader.readLine()) != null){
+                lineCount += 1;
+                if(lineCount != 1){     // 跳过第一行
+                    lineTxt = lineTxt.contains("=") ? lineTxt.substring(0, lineTxt.indexOf("=")).trim() : lineTxt;
+                    String[] aa = lineTxt.split("/");
+                    for (int i = 1; i < aa.length; i++) {
+                        Bill bill = new Bill();
+                        bill.setChDay(aa[0]);
+                        String str1 = aa[i].trim();
+                        if(strIsNotNull(str1)) {
+                            for (int j = str1.length()-1; j >= 0; j--) {
+                                if(!isNumber(str1.charAt(j))) {
+                                    String substr = str1.substring(j+1, str1.length());
+                                    if(str1.charAt(j)==43){     //若是 “+” 则为收入
+                                        bill.setIncomeNm(str1.substring(0, j));
+                                        bill.setIncome(Double.parseDouble(substr));
+                                        break;
+                                    } else {                    //否则支出
+                                        bill.setOutcomeNm(str1.substring(0, j+1));
+                                        bill.setOutcome(Double.valueOf(substr));
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        billList.add(bill);
+                    }
+                }
+            }
+            billList.forEach(System.out::println);
+            return billList;
+        } catch (Exception e) {
+            System.err.println("读取文件内容出错");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
 }
