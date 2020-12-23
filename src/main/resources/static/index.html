@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="layui/css/layui.css"  media="all">
     <script src="layui/layui.js" charset="utf-8"></script>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
 </head>
 <body>
 
@@ -22,7 +23,7 @@
         <input type="text" name="sourcepath" id="sourcepath" style="width: 420px;display: none; margin-left: 25px;">
     </div>
     <textarea name="description" placeholder="请输入资源介绍" required lay-verify="required" class="layui-textarea" style="font-size: 15px;margin-bottom: 20ox;width: 800px;"></textarea>
-    <button class="layui-btn" lay-submit lay-filter="uploadbtn" style="margin-left: 660px ;margin-top:25px;width: 120px;">立即提交</button>
+    <button id="submit" class="layui-btn" lay-submit lay-filter="uploadbtn" style="margin-left: 660px ;margin-top:25px;width: 120px;">立即提交</button>
 </form>
 <br>
 <br>
@@ -33,11 +34,10 @@
 <script>
 
     layui.use('upload', function(){
-        var $ = layui.jquery;
-        var upload = layui.upload;
-
+        let $ = layui.jquery;
+        let upload = layui.upload;
         //执行实例
-        var uploadInst = upload.render({
+        let uploadInst = upload.render({
             elem: '#test4', //绑定元素
             accept: 'file',
             size: 307200,
@@ -50,7 +50,6 @@
                     title: "提示"
                 });
                 $("#sourcepath").val(res.msg);
-
             }
             ,error: function(res){
                 //请求异常回调
@@ -62,9 +61,8 @@
         });
     });
 
-    layui.use('table', function(){
-        var table = layui.table;
-
+    let dataTable = layui.use('table', function(){
+        let table = layui.table;
         table.render({
             elem: '#test'
             ,url:'/source/getData'
@@ -92,7 +90,7 @@
             }
         });
     });
+    $("#")
 </script>
-
 </body>
 </html>
