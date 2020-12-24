@@ -2,7 +2,7 @@ package com.chen.entiey;
 
 import java.util.Date;
 
-public class Bill {
+public class AccountBook {
     private String chDay;
     private String incomeNm;
     private String outcomeNm;
@@ -10,7 +10,7 @@ public class Bill {
     private Double outcome;
     private Date stanDay;
 
-    public Bill(String chDay, String incomeNm, String outcomeNm, Double income, Double outcome, Date stanDay) {
+    public AccountBook(String chDay, String incomeNm, String outcomeNm, Double income, Double outcome, Date stanDay) {
         this.chDay = chDay;
         this.incomeNm = incomeNm;
         this.outcomeNm = outcomeNm;
@@ -19,7 +19,7 @@ public class Bill {
         this.stanDay = stanDay;
     }
 
-    public Bill() {
+    public AccountBook() {
     }
 
     public String getChDay() {
@@ -72,7 +72,7 @@ public class Bill {
 
     @Override
     public String toString() {
-        return "Bill{" +
+        return "AccountBook{" +
                 "chDay='" + chDay + '\'' +
                 ", incomeNm='" + incomeNm + '\'' +
                 ", income=" + income +

@@ -9,28 +9,49 @@
     <link rel="stylesheet" href="layui/css/layui.css"  media="all">
     <script src="layui/layui.js" charset="utf-8"></script>
     <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <style>
+        .accb-header {
+            color: #F2F2F2;
+        }
+        .accb-table {
+            width: 800px;
+        }
+        .accb-table-container {
+            width: 80%;
+            position: absolute;
+            left: 10%;
+        }
+    </style>
 </head>
 <body>
 
-<fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
-    <legend>选完文件后不自动上传</legend>
-</fieldset>
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header accb-header">头部</div>
+    <div class="layui-side layui-bg-black">侧边栏</div>
+    <div class="layui-body">
+        <!--内容-->
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+            <legend>选完文件后不自动上传</legend>
+        </fieldset>
+        <form method="post" id="sourceupload">
+            <div style="padding-left: 50px;margin-bottom: 25px;">
+                <button type="button" class="layui-btn layui-btn-primary" id="test4"><i class="layui-icon"></i>资源上传</button>
+                <!--<input type="text" name="sourcename" required lay-verify="required" placeholder="请输入资源名称"class="layui-input" style="width: 420px;display: inline; margin-left: 25px;">-->
+                <!--<input type="text" name="sourcepath" id="sourcepath" style="width: 420px;display: none; margin-left: 25px;">-->
+            </div>
+            <!--<textarea name="description" placeholder="请输入资源介绍" required lay-verify="required" class="layui-textarea" style="font-size: 15px;margin-bottom: 20px;width: 800px;"></textarea>-->
 
-<form method="post" id="sourceupload">
-    <div style="padding-left: 50px;margin-bottom: 25px;">
-        <button type="button" class="layui-btn layui-btn-primary" id="test4"><i class="layui-icon"></i>资源上传</button>
-        <input type="text" name="sourcename" required lay-verify="required" placeholder="请输入资源名称"class="layui-input" style="width: 420px;display: inline; margin-left: 25px;">
-        <input type="text" name="sourcepath" id="sourcepath" style="width: 420px;display: none; margin-left: 25px;">
+        </form>
+        <div class="accb-table-container">
+            <table class="layui-hide accb-table" id="test" lay-filter="test"></table>
+            <button class="layui-btn" lay-submit lay-filter="uploadbtn" style="width: 120px;">立即提交</button>
+
+        </div>
+
     </div>
-    <textarea name="description" placeholder="请输入资源介绍" required lay-verify="required" class="layui-textarea" style="font-size: 15px;margin-bottom: 20px;width: 800px;"></textarea>
-    <button class="layui-btn" lay-submit lay-filter="uploadbtn" style="margin-left: 660px ;margin-top:25px;width: 120px;">立即提交</button>
-</form>
-<br>
-<br>
-<br>
-<br>
-<br>
-<table class="layui-hide" id="test" lay-filter="test"></table>
+    <div class="layui-footer">底部</div>
+</div>
+
 <script>
 
     layui.use('upload', function(){
@@ -65,19 +86,19 @@
         let table = layui.table;
         table.render({
             elem: '#test'
-            ,url:'/source/getData'
+            ,url:'/source/getInitData'
             ,toolbar: true
             ,title: '数据表'
             ,totalRow: true
             ,cols: [[
-                {field:'chDay', title:'chDay', width:80, fixed: 'left', unresize: true, sort: true}
+                {field:'chDay', title:'chDay', width:80, fixed: 'left'}
                 ,{field:'incomeNm', title:'incomeNm', width:120, edit: 'text'}
                 ,{field:'income', title:'income', width:150, edit: 'text', totalRow: true}
-                ,{field:'outcomeNm', title:'outcomeNm', width:100, sort: true, totalRow: true}
-                ,{field:'outcome', title:'outcome', width:80, edit: 'text', sort: true, totalRow: true}
+                ,{field:'outcomeNm', title:'outcomeNm', width:120, sort: true, totalRow: true}
+                ,{field:'outcome', title:'outcome', width:120, edit: 'text', sort: true, totalRow: true}
                 ,{field:'stanDay', title:'stanDay', width:100, sort: true, totalRow: true}
             ]]
-            ,page: true
+            ,page: false
             ,response: {
                 statusCode: 200 //重新规定成功的状态码为 200，table 组件默认为 0
             }
@@ -90,7 +111,6 @@
             }
         });
     });
-    $("#")
 </script>
 </body>
 </html>

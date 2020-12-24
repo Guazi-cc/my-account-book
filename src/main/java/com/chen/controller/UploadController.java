@@ -1,6 +1,6 @@
 package com.chen.controller;
 
-import com.chen.entiey.Bill;
+import com.chen.entiey.AccountBook;
 import com.chen.entiey.Common;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -18,38 +18,44 @@ import java.util.List;
 @RequestMapping("/source")
 public class UploadController {
 
-    public Common<Bill> billCommon = new Common<>();
+    private Common<AccountBook> accbRes = new Common<>();
 
     @PostMapping("/myUploadSource")
     @ResponseBody
-    public Common<Bill> myUploadSource(@RequestParam("file") MultipartFile file , HttpServletRequest request) {
+    public Common<AccountBook> myUploadSource(@RequestParam("file") MultipartFile file , HttpServletRequest request) {
         String fileName = file.getOriginalFilename();
         String suffix = fileName.substring(fileName.lastIndexOf("."), fileName.length());
         if(".txt".equals(suffix)) {
             try {
-                List<Bill> billList = analysisAccountBookFile(file.getInputStream());
-                if (billList != null) {
-                    billCommon.setCode(200);
-                    billCommon.setMsg("Oj8K");
-                    billCommon.setList(billList);
+                List<AccountBook> accountBookList = analysisAccountBookFile(file.getInputStream());
+                if (accountBookList != null) {
+                    accbRes.setCode(200);
+                    accbRes.setMsg("Oj8K");
+                    accbRes.setList(accountBookList);
                 } else {
-                    billCommon.setCode(500);
-                    billCommon.setMsg("读取文件出错");
+                    accbRes.setCode(500);
+                    accbRes.setMsg("读取文件出错");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
-            billCommon.setMsg("请传txt");
-            billCommon.setCode(500);
+            accbRes.setMsg("请传txt");
+            accbRes.setCode(500);
         }
-        return billCommon;
+        return accbRes;
+    }
+
+    @GetMapping("/getInitData")
+    @ResponseBody
+    public Common<AccountBook> getInitData() {
+        return new Common<>();
     }
 
     @GetMapping("/getData")
     @ResponseBody
-    public Common<Bill> getData() {
-        return billCommon;
+    public Common<AccountBook> getData() {
+        return accbRes;
     }
 
     /**
@@ -105,8 +111,8 @@ public class UploadController {
         return str != null && !"".equals(str);
     }
 
-    public List<Bill> analysisAccountBookFile(InputStream inputStream) {
-        List<Bill> billList = new ArrayList<>();
+    public List<AccountBook> analysisAccountBookFile(InputStream inputStream) {
+        List<AccountBook> accountBookList = new ArrayList<>();
         try(InputStreamReader read = new InputStreamReader(inputStream, StandardCharsets.UTF_8.name())) {
             BufferedReader bufferedReader = new BufferedReader(read);
             String lineTxt;
@@ -117,31 +123,31 @@ public class UploadController {
                     lineTxt = lineTxt.contains("=") ? lineTxt.substring(0, lineTxt.indexOf("=")).trim() : lineTxt;
                     String[] aa = lineTxt.split("/");
                     for (int i = 1; i < aa.length; i++) {
-                        Bill bill = new Bill();
-                        bill.setChDay(aa[0]);
+                        AccountBook accountBook = new AccountBook();
+                        accountBook.setChDay(aa[0]);
                         String str1 = aa[i].trim();
                         if(strIsNotNull(str1)) {
                             for (int j = str1.length()-1; j >= 0; j--) {
                                 if(!isNumber(str1.charAt(j))) {
                                     String substr = str1.substring(j+1, str1.length());
                                     if(str1.charAt(j)==43){     //若是 “+” 则为收入
-                                        bill.setIncomeNm(str1.substring(0, j));
-                                        bill.setIncome(Double.parseDouble(substr));
+                                        accountBook.setIncomeNm(str1.substring(0, j));
+                                        accountBook.setIncome(Double.parseDouble(substr));
                                         break;
                                     } else {                    //否则支出
-                                        bill.setOutcomeNm(str1.substring(0, j+1));
-                                        bill.setOutcome(Double.valueOf(substr));
+                                        accountBook.setOutcomeNm(str1.substring(0, j+1));
+                                        accountBook.setOutcome(Double.valueOf(substr));
                                         break;
                                     }
                                 }
                             }
                         }
-                        billList.add(bill);
+                        accountBookList.add(accountBook);
                     }
                 }
             }
-            billList.forEach(System.out::println);
-            return billList;
+            accountBookList.forEach(System.out::println);
+            return accountBookList;
         } catch (Exception e) {
             System.err.println("读取文件内容出错");
             e.printStackTrace();
